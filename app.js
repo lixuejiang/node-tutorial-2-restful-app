@@ -5,14 +5,20 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 // Database
-var mongo = require('mongodb');
-var monk = require('monk');
-var db = monk('localhost:27017/nodetest2');
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
+var incomes = require('./routes/income');
 
 var app = express();
+
+app.all('*', function(req, res, next) {  
+    res.header("Access-Control-Allow-Origin", "*");  
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");  
+    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");  
+    res.header("X-Powered-By",' 3.2.1')  
+    res.header("Content-Type", "application/json;charset=utf-8");  
+    next();  
+});  
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -26,14 +32,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Make our db accessible to our router
-app.use(function(req,res,next){
-    req.db = db;
-    next();
-});
 
 app.use('/', routes);
-app.use('/users', users);
+app.use('/api', incomes);
 
 /// catch 404 and forwarding to error handler
 app.use(function(req, res, next) {
